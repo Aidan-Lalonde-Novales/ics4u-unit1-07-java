@@ -1,11 +1,11 @@
-/**
- * This program prints out grades with a median
- * of 75 to a .csv file.
- *
- * By:      Aidan Lalonde-Novales
- * Version: 1.0
- * Since:   2022-11-05
- */
+/*
+* This program prints out grades with a median
+* of 75 to a .csv file.
+*
+* By:      Aidan Lalonde-Novales
+* Version: 1.0
+* Since:   2022-11-05
+*/
 
 import java.io.BufferedReader;
 import java.io.File;
