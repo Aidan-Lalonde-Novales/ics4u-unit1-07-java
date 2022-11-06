@@ -4,20 +4,18 @@
  *
  * By:      Aidan Lalonde-Novales
  * Version: 1.0
- * Since:   2022-11-03
+ * Since:   2022-11-05
  */
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -40,19 +38,57 @@ final class Marks {
     /**
     * The generateMarks() function.
     *
-    * @param arrayOfStudents the collection of students
-    * @param arrayOfAssignments the collection of assignments
-    * @return the generated marks
+    * @param studentsArray the collection of students
+    * @param unitsArray the collection of assignments
     */
-    public static String[][] generateMarks(final Integer[] arrayOfStudents, 
-                                       final Integer[] arrayOfAssignments) {
 
-        // this is just a place holder!
-        String[][] markArray = { { "", "Ass #1", "Ass #2" }, 
-                           { "Sue", "76%", "88%" },
-                           { "Bob", "46%", "81%" } };
+    public static void generateMarks(final ArrayList<String> studentsArray,
+                                       final ArrayList<String> unitsArray) {
+        // Declares constants for the function.
+        final Random random = new Random();
+        final int studentLength = studentsArray.size();
+        final int unitLength = unitsArray.size();
+        final ArrayList<ArrayList<String>> table =
+                new ArrayList<ArrayList<String>>();
 
-        return markArray;
+        // Creates top row.
+        final ArrayList<String> topRow = new ArrayList<String>();
+        topRow.add(" ");
+        for (int count = 0; count < unitLength; count++) {
+            topRow.add(unitsArray.get(count));
+        }
+        table.add(topRow);
+
+        // Generates random marks to be added to the table.
+        for (int count = 0; count < studentLength; count++) {
+            final ArrayList<String> studentRow = new ArrayList<String>();
+            studentRow.add(studentsArray.get(count));
+            for (int count2 = 0; count2 < unitLength; count2++) {
+                final int mark = (int) Math.floor(random.nextGaussian()
+                                  * 10 + 75);
+                studentRow.add(String.valueOf(mark));
+            }
+            table.add(studentRow);
+        }
+
+        // Create csv file.
+        final String csvName = "marks.csv";
+        final File file = new File(csvName);
+
+        // Formatting for the table.
+        try {
+            final FileWriter fileWriter = new FileWriter(csvName, false);
+
+            for (int count = 0; count < table.size(); count++) {
+                final String line = String.join(",", table.get(count)) + ",\n";
+                System.out.println(line);
+                fileWriter.write(line);
+            }
+            fileWriter.close();
+        } catch (IOException error) {
+            System.out.println("Something went wrong.");
+            error.printStackTrace();
+        }
     }
 
     /**
@@ -61,42 +97,38 @@ final class Marks {
     * @param args No args will be used
     */
     public static void main(final String[] args) {
-        final ArrayList<String> listOfStudents = new ArrayList<String>();
-        final ArrayList<String> listOfAssingments = new ArrayList<String>();
-        final Path studentFilePath = Paths.get("../", args[0]);
-        final Path assignmentFilePath = Paths.get("../", args[1]);
+        final ArrayList<String> studentsList = new ArrayList<String>();
+        final ArrayList<String> unitsList = new ArrayList<String>();
+        final Path studentFilePath = Paths.get(args[0]);
+        final Path unitFilePath = Paths.get(args[1]);
         final Charset charset = Charset.forName("UTF-8");
 
+        // read students.txt
         try (BufferedReader readerStudent = Files.newBufferedReader(
                                      studentFilePath, charset)) {
             String lineStudent = null;
             while ((lineStudent = readerStudent.readLine()) != null) {
-                listOfStudents.add(lineStudent);
-                System.out.println(lineStudent);
+                studentsList.add(lineStudent);
             }
         } catch (IOException errorCode) {
             System.err.println(errorCode);
         }
 
+        // reads units.txt
         try (BufferedReader readerAssignment = Files.newBufferedReader(
-                                     assignmentFilePath, charset)) {
+                                     unitFilePath, charset)) {
             String lineAssignment = null;
             while ((lineAssignment = readerAssignment.readLine()) != null) {
-                listOfAssingments.add(lineAssignment);
-                System.out.println(lineAssignment);
+                unitsList.add(lineAssignment);
             }
         } catch (IOException errorCode) {
             System.err.println(errorCode);
         }
 
-        // Normal Distribution numbers
-        Random random = new Random();
+        // outputs onto the file
+        generateMarks(studentsList, unitsList);
 
-        for (int loopCounter = 0; loopCounter < 5; loopCounter++) {
-            int mark = (int)Math.floor(random.nextGaussian()*10+75);
-            System.out.println(mark);
-        }
-
+        // end of program
         System.out.println("\nDone.");
     }
 }
